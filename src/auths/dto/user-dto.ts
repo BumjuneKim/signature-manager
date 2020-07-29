@@ -5,12 +5,16 @@ export class UserDto {
     email: string;
     @IsNotEmpty()
     name: string;
-    @IsNotEmpty()
-    password: string;
     @IsBoolean()
     isManager: boolean;
+    @IsNotEmpty()
+    password: string;
 
-    setPassword(password: string) {
+    getEmail(): string {
+        return this.email;
+    }
+
+    setPassword(password: string): void {
         this.password = password;
     }
 }
