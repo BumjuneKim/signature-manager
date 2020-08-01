@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PassportSerializer } from "@nestjs/passport";
 import { InjectRepository } from "@nestjs/typeorm";
-import { User } from "../common/schemas/user.entity";
+import { User } from "../entity/user.entity";
 import { MongoRepository } from "typeorm";
 
 @Injectable()

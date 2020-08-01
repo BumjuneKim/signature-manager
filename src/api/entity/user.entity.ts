@@ -1,5 +1,15 @@
 import { Entity, Column, ObjectIdColumn, ObjectID, CreateDateColumn } from "typeorm";
 
+export enum TeamCrewAuthority {
+    READ_ONLY = "READ_ONLY",
+    WRITE_READ = "WRITE_READ",
+}
+
+interface IBelongingTeam {
+    teamId: string;
+    authority: TeamCrewAuthority;
+}
+
 @Entity("users")
 export class User {
     @ObjectIdColumn()
@@ -12,6 +22,8 @@ export class User {
     password: string;
     @Column()
     isManager: boolean;
+    @Column()
+    belongingTeams: IBelongingTeam[];
     @CreateDateColumn()
     createdAt: Date;
 

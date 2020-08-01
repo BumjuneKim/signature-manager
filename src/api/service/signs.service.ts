@@ -2,11 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MongoRepository } from "typeorm";
 import { isEmpty } from "lodash";
-import { User } from "../common/schemas/user.entity";
-import { ApiException } from "../common/exception/ApiException";
-import { AuthErrors, SignErrors } from "../common/exception/ErrorCodes";
-import { Sign, SignStatus } from "../common/schemas/sign.entity";
-import { putImageToS3 } from "../common/utils/s3Uploader";
+import { User } from "../entity/user.entity";
+import { ApiException } from "../../common/exception/ApiException";
+import { AuthErrors, SignErrors } from "../../common/exception/ErrorCodes";
+import { Sign, SignStatus } from "../entity/sign.entity";
+import { putImageToS3 } from "../../common/utils/s3Uploader";
 
 @Injectable()
 export class SignsService {
@@ -49,35 +49,4 @@ export class SignsService {
 
         return this.signsRepository.updateOne({ _id: targetSign.id }, { $set: { status: SignStatus.DELETED } });
     }
-
-    // async doSignUp(userDto: UserDto): Promise<User> {
-    //     const equalEmailUser = await this.usersRepository.findOne({
-    //         email: userDto.getEmail(),
-    //     });
-    //     if (equalEmailUser) throw new ApiException(AuthErrors.ALREADY_JOINED_EMAIL);
-    //
-    //     const digestedPassword = crypto
-    //         .createHash("sha256")
-    //         .update(userDto.password)
-    //         .digest("hex");
-    //     const hashedPassword = await bcrypt.hash(digestedPassword, 10);
-    //     userDto.setPassword(hashedPassword);
-    //
-    //     return await this.usersRepository.save(new User(userDto));
-    // }
-    //
-    // async doSignIn(email: string, pwd: string): Promise<any> {
-    //     const targetUser = await this.usersRepository.findOne({ email });
-    //     if (!targetUser) return null;
-    //
-    //     const digestedPassword = crypto
-    //         .createHash("sha256")
-    //         .update(pwd)
-    //         .digest("hex");
-    //     const pwCheckResult = await bcrypt.compare(digestedPassword, targetUser.password);
-    //     if (!pwCheckResult) throw new ApiException(AuthErrors.WRONG_PASSWORD);
-    //
-    //     const { password, ...userInfo } = targetUser;
-    //     return userInfo;
-    // }
 }

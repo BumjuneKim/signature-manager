@@ -8,11 +8,8 @@ export class Team {
     owner: string;
     @Column()
     sharedSignIds: string[];
-
     @Column()
-    signImageUrl: string;
-    // @Column({ enum: Object.keys(SignStatus) })
-    // status: string;
+    name: string;
     @CreateDateColumn()
     createdAt: Date;
 

@@ -1,4 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
+import { TeamCreateDto } from "../../api/dto/team-create-dto";
 
 export interface ErrorData {
     errorCode: number;
@@ -18,11 +19,26 @@ export enum SignErrors {
     NO_IMAGE = 2002,
     NO_SIGN = 2003,
     NOT_MY_SIGN = 2004,
+    NOT_ACTIVE = 2005,
+}
+
+export enum TeamErrors {
+    NOT_ALLOW_TEAM_CREATE = 3001,
+    HAS_ALREADY_EQUAL_NAME_TEAM = 3002,
+    NO_TEAM = 3003,
+    NOT_ALLOW_ADD_TEAM_CREW = 3004,
+    NOT_EXISTS_CREW = 3005,
+    MANAGER_CAN_NOT_BE_CREW = 3006,
+    ALREADY_ADDED = 3007,
+    NOT_MY_OWN_TEAM = 3008,
+    ALREADY_TEAM_SIGN = 3009,
+    NOT_TEAM_CREW = 3010,
+    NO_WRITE_PERMISSION = 3011,
 }
 
 export enum CommonErrors {}
 
-export type ErrorCodes = AuthErrors | SignErrors | CommonErrors;
+export type ErrorCodes = AuthErrors | SignErrors | TeamErrors | CommonErrors;
 
 const errors: { [code: number]: ErrorData } = {
     [AuthErrors.NOT_LOGGED_IN]: {
@@ -63,7 +79,67 @@ const errors: { [code: number]: ErrorData } = {
     [SignErrors.NOT_MY_SIGN]: {
         errorCode: SignErrors.NOT_MY_SIGN,
         status: HttpStatus.FORBIDDEN,
-        message: "",
+        message: "자신의 서명만 삭제 가능 합니다.",
+    },
+    [SignErrors.NOT_ACTIVE]: {
+        errorCode: SignErrors.NOT_ACTIVE,
+        status: HttpStatus.BAD_REQUEST,
+        message: "사용이 불가능한 서명입니다.",
+    },
+    [TeamErrors.NOT_ALLOW_TEAM_CREATE]: {
+        errorCode: TeamErrors.NOT_ALLOW_TEAM_CREATE,
+        status: HttpStatus.FORBIDDEN,
+        message: "팀을 생성할 수 있는 권한이 없습니다.",
+    },
+    [TeamErrors.HAS_ALREADY_EQUAL_NAME_TEAM]: {
+        errorCode: TeamErrors.HAS_ALREADY_EQUAL_NAME_TEAM,
+        status: HttpStatus.BAD_REQUEST,
+        message: "같은 이름의 팀이 존재합니다.",
+    },
+    [TeamErrors.NO_TEAM]: {
+        errorCode: TeamErrors.NO_TEAM,
+        status: HttpStatus.NOT_FOUND,
+        message: "팀이 존재하지 않습니다.",
+    },
+    [TeamErrors.NOT_ALLOW_ADD_TEAM_CREW]: {
+        errorCode: TeamErrors.NOT_ALLOW_ADD_TEAM_CREW,
+        status: HttpStatus.FORBIDDEN,
+        message: "팀원을 추가할 권한이 없습니다.",
+    },
+    [TeamErrors.NOT_EXISTS_CREW]: {
+        errorCode: TeamErrors.NOT_EXISTS_CREW,
+        status: HttpStatus.BAD_REQUEST,
+        message: "팀원이 존재하지 않습니다.",
+    },
+    [TeamErrors.MANAGER_CAN_NOT_BE_CREW]: {
+        errorCode: TeamErrors.MANAGER_CAN_NOT_BE_CREW,
+        status: HttpStatus.FORBIDDEN,
+        message: "팀장은 팀원이 될 수 없습니다.",
+    },
+    [TeamErrors.ALREADY_ADDED]: {
+        errorCode: TeamErrors.ALREADY_ADDED,
+        status: HttpStatus.BAD_REQUEST,
+        message: "이미 팀원으로 등록되었습니다.",
+    },
+    [TeamErrors.NOT_MY_OWN_TEAM]: {
+        errorCode: TeamErrors.NOT_MY_OWN_TEAM,
+        status: HttpStatus.FORBIDDEN,
+        message: "소유한 팀이 아닙니다.",
+    },
+    [TeamErrors.ALREADY_TEAM_SIGN]: {
+        errorCode: TeamErrors.ALREADY_TEAM_SIGN,
+        status: HttpStatus.BAD_REQUEST,
+        message: "이미 팀 서명으로 등록되었습니다.",
+    },
+    [TeamErrors.NOT_TEAM_CREW]: {
+        errorCode: TeamErrors.NOT_TEAM_CREW,
+        status: HttpStatus.FORBIDDEN,
+        message: "팀 접근 권한 없음",
+    },
+    [TeamErrors.NO_WRITE_PERMISSION]: {
+        errorCode: TeamErrors.NO_WRITE_PERMISSION,
+        status: HttpStatus.FORBIDDEN,
+        message: "팀 설정 변경 권한 없음",
     },
 };
 

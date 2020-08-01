@@ -2,11 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as crypto from "crypto";
 import * as bcrypt from "bcryptjs";
-import { User } from "../common/schemas/user.entity";
+import { User } from "../entity/user.entity";
 import { MongoRepository } from "typeorm";
-import { UserDto } from "./dto/user-dto";
-import { ApiException } from "../common/exception/ApiException";
-import { AuthErrors } from "../common/exception/ErrorCodes";
+import { UserDto } from "../dto/user-dto";
+import { ApiException } from "../../common/exception/ApiException";
+import { AuthErrors } from "../../common/exception/ErrorCodes";
 
 @Injectable()
 export class AuthsService {

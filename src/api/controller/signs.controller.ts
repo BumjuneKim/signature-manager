@@ -2,6 +2,7 @@ import {
     Controller,
     Delete,
     Get,
+    HttpCode,
     Param,
     Post,
     Request,
@@ -11,11 +12,11 @@ import {
     UsePipes,
     ValidationPipe,
 } from "@nestjs/common";
-import { IRequestWithUser } from "../common/interface/IRequestWithUser";
+import { IRequestWithUser } from "../../common/interface/IRequestWithUser";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { SignsService } from "./signs.service";
-import { ApiExceptionFilter } from "../common/exception/ApiExceptionFilter";
-import { Sign } from "../common/schemas/sign.entity";
+import { SignsService } from "../service/signs.service";
+import { ApiExceptionFilter } from "../../common/exception/ApiExceptionFilter";
+import { Sign } from "../entity/sign.entity";
 
 @Controller("/api/signs")
 @UseFilters(new ApiExceptionFilter())

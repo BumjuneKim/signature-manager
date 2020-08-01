@@ -4,19 +4,19 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 // import { AppService } from './app.service';
 import { ConfigModule } from "@nestjs/config";
 import { PassportModule } from "@nestjs/passport";
-import { PetsController } from "./pets/pets.controller";
-import { Pet } from "./pets/pet.entity";
-import { User } from "./common/schemas/user.entity";
+import { User } from "./api/entity/user.entity";
 import { join } from "path";
-import { AuthsController } from "./auths/auths.controller";
-import { AuthsService } from "./auths/auths.service";
-import { LocalStrategy } from "./auths/local.strategy";
-import { LocalSerializer } from "./auths/local.serializer";
-import { LocalAuthGuard } from "./auths/local.authguard";
-import { SignsController } from "./signs/signs.controller";
-import { Sign } from "./common/schemas/sign.entity";
-import { SignsService } from "./signs/signs.service";
-import { TeamsController } from './teams/teams.controller';
+import { AuthsController } from "./api/controller/auths.controller";
+import { AuthsService } from "./api/service/auths.service";
+import { LocalStrategy } from "./api/auth/local.strategy";
+import { LocalSerializer } from "./api/auth/local.serializer";
+import { LocalAuthGuard } from "./api/auth/local.authguard";
+import { SignsController } from "./api/controller/signs.controller";
+import { Sign } from "./api/entity/sign.entity";
+import { SignsService } from "./api/service/signs.service";
+import { TeamsController } from "./api/controller/teams.controller";
+import { TeamsService } from "./api/service/teams.service";
+import { Team } from "./api/entity/team.entity";
 
 @Module({
     imports: [
@@ -34,9 +34,9 @@ import { TeamsController } from './teams/teams.controller';
             defaultStrategy: "local",
             session: true,
         }),
-        TypeOrmModule.forFeature([Pet, User, Sign]),
+        TypeOrmModule.forFeature([User, Sign, Team]),
     ],
-    controllers: [PetsController, AuthsController, SignsController, TeamsController],
-    providers: [AuthsService, SignsService, LocalStrategy, LocalSerializer, LocalAuthGuard],
+    controllers: [AuthsController, SignsController, TeamsController],
+    providers: [AuthsService, SignsService, TeamsService, LocalStrategy, LocalSerializer, LocalAuthGuard],
 })
 export class AppModule {}
