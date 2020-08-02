@@ -18,9 +18,11 @@ import { TeamsController } from "./api/controller/teams.controller";
 import { TeamsService } from "./api/service/teams.service";
 import { Team } from "./api/entity/team.entity";
 
+const envFilePath = process.env.NODE_ENV === "docker" ? ".env.docker" : ".env";
+
 @Module({
     imports: [
-        ConfigModule.forRoot(),
+        ConfigModule.forRoot({ envFilePath: envFilePath }),
         TypeOrmModule.forRoot({
             type: "mongodb",
             url: process.env.DB_CONNECTION_STRING,
