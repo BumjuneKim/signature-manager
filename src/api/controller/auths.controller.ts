@@ -24,7 +24,7 @@ export class AuthsController {
 
     @Post("signup")
     @UsePipes(new ValidationPipe({ transform: true }))
-    async signUp(@Request() req: Request, @Body() userDto: UserDto): Promise<IResponse<Omit<User, "password">>> {
+    async signUp(@Body() userDto: UserDto): Promise<IResponse<Omit<User, "password">>> {
         const { password, ...result } = await this.authsService.doSignUp(userDto);
         return setSuccessRespFormat(result);
     }
