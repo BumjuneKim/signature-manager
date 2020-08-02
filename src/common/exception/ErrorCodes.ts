@@ -34,6 +34,7 @@ export enum TeamErrors {
     ALREADY_TEAM_SIGN = 3009,
     NOT_TEAM_CREW = 3010,
     NO_WRITE_PERMISSION = 3011,
+    NOT_ALLOW_EDIT_CREW_AUTH = 3012,
 }
 
 export enum CommonErrors {}
@@ -140,6 +141,11 @@ const errors: { [code: number]: ErrorData } = {
         errorCode: TeamErrors.NO_WRITE_PERMISSION,
         status: HttpStatus.FORBIDDEN,
         message: "팀 설정 변경 권한 없음",
+    },
+    [TeamErrors.NOT_ALLOW_EDIT_CREW_AUTH]: {
+        errorCode: TeamErrors.NOT_ALLOW_EDIT_CREW_AUTH,
+        status: HttpStatus.FORBIDDEN,
+        message: "팀원 권한 변경 권한 없음",
     },
 };
 

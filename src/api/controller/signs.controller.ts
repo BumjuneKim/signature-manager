@@ -17,6 +17,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { SignsService } from "../service/signs.service";
 import { ApiExceptionFilter } from "../../common/exception/ApiExceptionFilter";
 import { Sign } from "../entity/sign.entity";
+import { IResponse, setSuccessRespFormat } from "../../common/middleware/userParse";
 
 @Controller("/api/signs")
 @UseFilters(new ApiExceptionFilter())
@@ -50,18 +51,21 @@ export class SignsController {
         }),
     )
     @UsePipes(new ValidationPipe({ transform: true }))
-    async addSign(@Request() req: IRequestWithUser, @UploadedFile() image): Promise<Sign> {
-        return await this.signsService.addSign({ user: req.user, image });
+    async addSign(@Request() req: IRequestWithUser, @UploadedFile() image): Promise<IResponse<Sign>> {
+        const sign = await this.signsService.addSign({ user: req.user, image });
+        return setSuccessRespFormat(sign);
     }
 
     @Get()
-    async getMySigns(@Request() req: IRequestWithUser): Promise<Sign[]> {
-        return await this.signsService.getMySigns({ user: req.user });
+    async getMySigns(@Request() req: IRequestWithUser): Promise<IResponse<Sign[]>> {
+        const signs = await this.signsService.getMySigns({ user: req.user });
+        return setSuccessRespFormat(signs);
     }
 
     @Delete("/:signId")
     @UsePipes(new ValidationPipe({ transform: true }))
-    async deleteSign(@Request() req: IRequestWithUser, @Param("signId") signId: string): Promise<any> {
+    async deleteSign(@Request() req: IRequestWithUser, @Param("signId") signId: string): Promise<IResponse<void>> {
         await this.signsService.deleteSign({ user: req.user, signId });
+        return setSuccessRespFormat();
     }
 }

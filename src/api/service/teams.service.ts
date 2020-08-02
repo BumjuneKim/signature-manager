@@ -39,7 +39,7 @@ export class TeamsService {
         });
     }
 
-    async addCrewToTeam(options: { user: User; teamId: string; crewUserId: string }): Promise<any> {
+    async addCrewToTeam(options: { user: User; teamId: string; crewUserId: string }): Promise<void> {
         const { user, teamId, crewUserId } = options;
 
         if (isEmpty(user)) throw new ApiException(AuthErrors.NOT_LOGGED_IN);
@@ -56,13 +56,41 @@ export class TeamsService {
         const { belongingTeams = [] } = crewUser;
         if (belongingTeams.find(team => team.teamId === teamId)) throw new ApiException(TeamErrors.ALREADY_ADDED);
 
-        return await this.usersRepository.updateOne(
+        await this.usersRepository.updateOne(
             { _id: crewUser.id },
             { $push: { belongingTeams: { teamId, authority: TeamCrewAuthority.READ_ONLY } } },
         );
     }
 
-    async addTeamSignFromMine(options: { user: User; signId: string; teamId: string }): Promise<any> {
+    async editTeamCrewAuthority(options: {
+        user: User;
+        editAuthority: TeamCrewAuthority;
+        teamId: string;
+        crewId: string;
+    }): Promise<void> {
+        const { user, editAuthority, teamId, crewId } = options;
+
+        if (!user.isManager) throw new ApiException(TeamErrors.NOT_ALLOW_EDIT_CREW_AUTH);
+
+        const targetTeam = await this.teamsRepository.findOne(teamId);
+        if (!targetTeam) throw new ApiException(TeamErrors.NO_TEAM);
+        if (targetTeam.owner !== user.id.toString()) throw new ApiException(TeamErrors.NOT_MY_OWN_TEAM);
+
+        const crewUser = await this.usersRepository.findOne(crewId);
+        if (!crewUser) throw new ApiException(TeamErrors.NOT_EXISTS_CREW);
+
+        const belongsTeam = (crewUser.belongingTeams || []).find(bt => bt.teamId === teamId);
+        if (!belongsTeam) throw new ApiException(TeamErrors.NOT_TEAM_CREW);
+
+        belongsTeam.authority = editAuthority;
+
+        await this.usersRepository.updateOne(
+            { _id: crewUser.id },
+            { $set: { belongingTeams: crewUser.belongingTeams } },
+        );
+    }
+
+    async addTeamSignFromMine(options: { user: User; signId: string; teamId: string }): Promise<void> {
         const { user, signId, teamId } = options;
 
         if (isEmpty(user)) throw new ApiException(AuthErrors.NOT_LOGGED_IN);
@@ -89,9 +117,31 @@ export class TeamsService {
                 throw new ApiException(TeamErrors.NO_WRITE_PERMISSION);
         }
 
-        return await this.teamsRepository.updateOne(
-            { _id: new ObjectID(teamId) },
-            { $push: { sharedSignIds: signId } },
-        );
+        await this.teamsRepository.updateOne({ _id: new ObjectID(teamId) }, { $push: { sharedSignIds: signId } });
+    }
+
+    async deleteTeamSign(options: { user: User; signId: string; teamId: string }): Promise<void> {
+        const { user, signId, teamId } = options;
+
+        if (isEmpty(user)) throw new ApiException(AuthErrors.NOT_LOGGED_IN);
+
+        const targetSign = await this.signsRepository.findOne(signId);
+        if (!targetSign) throw new ApiException(SignErrors.NO_SIGN);
+
+        const targetTeam = await this.teamsRepository.findOne(teamId);
+        if (!targetTeam) throw new ApiException(TeamErrors.NO_TEAM);
+
+        if (user.isManager) {
+            if (targetTeam.owner !== user.id.toString()) {
+                throw new ApiException(TeamErrors.NOT_MY_OWN_TEAM);
+            }
+        } else {
+            const belongsTeam = user.belongingTeams.find(belongTeam => belongTeam.teamId === teamId);
+            if (!belongsTeam) throw new ApiException(TeamErrors.NOT_TEAM_CREW);
+            if (belongsTeam.authority !== TeamCrewAuthority.WRITE_READ)
+                throw new ApiException(TeamErrors.NO_WRITE_PERMISSION);
+        }
+
+        await this.teamsRepository.updateOne({ _id: new ObjectID(teamId) }, { $pull: { sharedSignIds: signId } });
     }
 }

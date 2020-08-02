@@ -1,9 +1,24 @@
-import { Controller, Request, Post, UsePipes, ValidationPipe, Body, Param, HttpCode } from "@nestjs/common";
+import {
+    Controller,
+    Request,
+    Post,
+    UsePipes,
+    ValidationPipe,
+    Body,
+    Param,
+    HttpCode,
+    Delete,
+    Put,
+} from "@nestjs/common";
 import { TeamsService } from "../service/teams.service";
 import { IRequestWithUser } from "../../common/interface/IRequestWithUser";
 import { TeamCreateDto } from "../dto/team-create-dto";
 import { TeamCrewAddDto } from "../dto/teamcrew-add-dto";
 import { TeamSignAddDto } from "../dto/teamsign-add-dto";
+import { Team } from "../entity/team.entity";
+import { IResponse, setSuccessRespFormat } from "../../common/middleware/userParse";
+import { TeamSignDeleteDto } from "../dto/teamsign-delete-dto";
+import { TeamCrewAuthEditDto } from "../dto/teamcrew-auth-edit-dto";
 
 @Controller("/api/teams")
 export class TeamsController {
@@ -11,8 +26,9 @@ export class TeamsController {
 
     @Post()
     @UsePipes(new ValidationPipe({ transform: true }))
-    async createTeam(@Request() req: IRequestWithUser, @Body() teamCreateDto: TeamCreateDto): Promise<any> {
-        return await this.teamsService.createTeam({ user: req.user, teamCreateDto });
+    async createTeam(@Request() req: IRequestWithUser, @Body() teamCreateDto: TeamCreateDto): Promise<IResponse<Team>> {
+        const team = await this.teamsService.createTeam({ user: req.user, teamCreateDto });
+        return setSuccessRespFormat(team);
     }
 
     // 팀 초대는 invitation 방식으로 가는게 좋을 것 같지만 여기서는 API 호출로 바로 팀원이 된다고 가정
@@ -23,8 +39,27 @@ export class TeamsController {
         @Request() req: IRequestWithUser,
         @Param("teamId") teamId: string,
         @Body() teamCrewAddDto: TeamCrewAddDto,
-    ): Promise<any> {
-        return await this.teamsService.addCrewToTeam({ user: req.user, teamId, crewUserId: teamCrewAddDto.crewUserId });
+    ): Promise<IResponse<void>> {
+        await this.teamsService.addCrewToTeam({ user: req.user, teamId, crewUserId: teamCrewAddDto.crewUserId });
+        return setSuccessRespFormat();
+    }
+
+    @Put("/:teamId/crew/:crewId")
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async editTeamCrewAuthority(
+        @Request() req: IRequestWithUser,
+        @Param("teamId") teamId: string,
+        @Param("crewId") crewId: string,
+        @Body() teamCrewAuthEditDto: TeamCrewAuthEditDto,
+    ): Promise<IResponse<void>> {
+        await this.teamsService.editTeamCrewAuthority({
+            user: req.user,
+            editAuthority: teamCrewAuthEditDto.editAuthority,
+            teamId,
+            crewId,
+        });
+
+        return setSuccessRespFormat();
     }
 
     @Post("/:teamId/sign")
@@ -33,7 +68,19 @@ export class TeamsController {
         @Request() req: IRequestWithUser,
         @Param("teamId") teamId: string,
         @Body() teamsignAddDto: TeamSignAddDto,
-    ): Promise<any> {
-        return await this.teamsService.addTeamSignFromMine({ user: req.user, signId: teamsignAddDto.signId, teamId });
+    ): Promise<IResponse<void>> {
+        await this.teamsService.addTeamSignFromMine({ user: req.user, signId: teamsignAddDto.signId, teamId });
+        return setSuccessRespFormat();
+    }
+
+    @Delete("/:teamId/sign")
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async deleteTeamSign(
+        @Request() req: IRequestWithUser,
+        @Param("teamId") teamId: string,
+        @Body() teamSignDeleteDto: TeamSignDeleteDto,
+    ): Promise<IResponse<void>> {
+        await this.teamsService.deleteTeamSign({ user: req.user, signId: teamSignDeleteDto.signId, teamId });
+        return setSuccessRespFormat();
     }
 }
