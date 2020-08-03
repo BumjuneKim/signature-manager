@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { MongoRepository } from "typeorm";
 import { Team } from "../entity/team.entity";
 import { TeamCrewAuthority, User } from "../entity/user.entity";
-import { TeamCreateDto } from "../dto/team-create-dto";
+import { TeamCreateDto } from "../dto/request/team-create-dto";
 import { isEmpty } from "lodash";
 import { ApiException } from "../../common/exception/ApiException";
 import { AuthErrors, SignErrors, TeamErrors } from "../../common/exception/ErrorCodes";

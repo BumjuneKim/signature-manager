@@ -1,5 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
-import { TeamCreateDto } from "../../api/dto/team-create-dto";
+import { TeamCreateDto } from "../../api/dto/request/team-create-dto";
 
 export interface ErrorData {
     errorCode: number;

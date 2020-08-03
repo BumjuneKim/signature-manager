@@ -12,13 +12,13 @@ import {
 } from "@nestjs/common";
 import { TeamsService } from "../service/teams.service";
 import { IRequestWithUser } from "../../common/interface/IRequestWithUser";
-import { TeamCreateDto } from "../dto/team-create-dto";
-import { TeamCrewAddDto } from "../dto/teamcrew-add-dto";
-import { TeamSignAddDto } from "../dto/teamsign-add-dto";
+import { TeamCreateDto } from "../dto/request/team-create-dto";
+import { TeamCrewAddDto } from "../dto/request/teamcrew-add-dto";
+import { TeamSignAddDto } from "../dto/request/teamsign-add-dto";
 import { Team } from "../entity/team.entity";
 import { IResponse, setSuccessRespFormat } from "../../common/middleware/userParse";
-import { TeamSignDeleteDto } from "../dto/teamsign-delete-dto";
-import { TeamCrewAuthEditDto } from "../dto/teamcrew-auth-edit-dto";
+import { TeamSignDeleteDto } from "../dto/request/teamsign-delete-dto";
+import { TeamCrewAuthEditDto } from "../dto/request/teamcrew-auth-edit-dto";
 
 @Controller("/api/teams")
 export class TeamsController {

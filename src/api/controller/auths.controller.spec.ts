@@ -5,7 +5,7 @@ import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "../entity/user.entity";
 import { join } from "path";
 import { ConfigModule } from "@nestjs/config";
-import { UserDto } from "../dto/user-dto";
+import { UserDto } from "../dto/request/user-dto";
 import { Repository } from "typeorm";
 
 export type MockType<T> = {

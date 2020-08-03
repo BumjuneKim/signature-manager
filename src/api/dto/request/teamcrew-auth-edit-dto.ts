@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty } from "class-validator";
-import { TeamCrewAuthority } from "../entity/user.entity";
+import { TeamCrewAuthority } from "../../entity/user.entity";
 
 export class TeamCrewAuthEditDto {
     @IsNotEmpty()

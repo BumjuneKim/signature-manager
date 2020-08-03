@@ -4,7 +4,7 @@ import * as crypto from "crypto";
 import * as bcrypt from "bcryptjs";
 import { User } from "../entity/user.entity";
 import { MongoRepository } from "typeorm";
-import { UserDto } from "../dto/user-dto";
+import { UserDto } from "../dto/request/user-dto";
 import { ApiException } from "../../common/exception/ApiException";
 import { AuthErrors } from "../../common/exception/ErrorCodes";
 
@@ -15,7 +15,7 @@ export class AuthsService {
         private readonly usersRepository: MongoRepository<User>,
     ) {}
 
-    async doSignUp(userDto: UserDto): Promise<User> {
+    async doSignUp(userDto: UserDto): Promise<void> {
         const equalEmailUser = await this.usersRepository.findOne({
             email: userDto.getEmail(),
         });
@@ -28,7 +28,7 @@ export class AuthsService {
         const hashedPassword = await bcrypt.hash(digestedPassword, 10);
         userDto.setPassword(hashedPassword);
 
-        return await this.usersRepository.save(new User(userDto));
+        await this.usersRepository.save(new User(userDto));
     }
 
     async doSignIn(email: string, pwd: string): Promise<any> {
