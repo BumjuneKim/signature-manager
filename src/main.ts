@@ -7,8 +7,7 @@ import * as cookieParser from "cookie-parser";
 import * as passport from "passport";
 import { userParse } from "./common/middleware/userParse";
 
-const port = process.env.PORT || 7000;
-
+const port = 7000;
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     const options = new DocumentBuilder()
