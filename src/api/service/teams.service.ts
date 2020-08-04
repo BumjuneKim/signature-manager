@@ -70,6 +70,7 @@ export class TeamsService {
     }): Promise<void> {
         const { user, editAuthority, teamId, crewId } = options;
 
+        if (isEmpty(user)) throw new ApiException(AuthErrors.NOT_LOGGED_IN);
         if (!user.isManager) throw new ApiException(TeamErrors.NOT_ALLOW_EDIT_CREW_AUTH);
 
         const targetTeam = await this.teamsRepository.findOne(teamId);

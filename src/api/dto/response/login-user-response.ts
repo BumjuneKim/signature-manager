@@ -6,9 +6,9 @@ export class LoginUserResponse {
         this.isManager = isManager;
     }
 
-    @ApiProperty({ description: "유저 ID" })
+    @ApiProperty({ description: "유저 ID", type: String })
     id: string;
 
-    @ApiProperty({ description: "팀장/팀원 여부" })
+    @ApiProperty({ description: "팀장/팀원 여부", type: Boolean })
     isManager: boolean;
 }

@@ -2,7 +2,6 @@ import {
     Controller,
     Delete,
     Get,
-    HttpStatus,
     Param,
     Post,
     Request,
@@ -16,14 +15,21 @@ import { IRequestWithUser } from "../../common/interface/IRequestWithUser";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { SignsService } from "../service/signs.service";
 import { ApiExceptionFilter } from "../../common/exception/ApiExceptionFilter";
-import { Sign } from "../entity/sign.entity";
-import { IResponse, setSuccessRespFormat } from "../../common/middleware/userParse";
-import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+    ApiBadRequestResponse,
+    ApiBody,
+    ApiConsumes,
+    ApiCreatedResponse,
+    ApiForbiddenResponse,
+    ApiNotFoundResponse,
+    ApiParam,
+    ApiTags,
+    ApiUnauthorizedResponse,
+} from "@nestjs/swagger";
 import { FileUploadDto } from "../dto/request/file-upload-dto";
-import { ApiImplicitFile } from "@nestjs/swagger/dist/decorators/api-implicit-file.decorator";
-import { UserDto } from "../dto/request/user-dto";
-import { SignupResponse } from "../dto/response/signup-response";
 import { SignAddResponse } from "../dto/response/sign-add-response";
+import { SignGetResponse } from "../dto/response/sign-get-response";
+import { SimpleSuccessResponse } from "../dto/response/simple-success-response";
 
 @ApiTags("signature-manager")
 @Controller("/api/signs")
@@ -61,23 +67,40 @@ export class SignsController {
     @ApiBody({ description: "서명 생성 API", type: FileUploadDto })
     @UsePipes(new ValidationPipe({ transform: true }))
     @ApiCreatedResponse({ description: "서명 등록 성공", type: SignAddResponse })
-    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "서명으로 사용할 이미지 없음" })
-    @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "비로그인 상태로 요청" })
+    @ApiBadRequestResponse({ description: "서명으로 사용할 이미지 없음" })
+    @ApiUnauthorizedResponse({ description: "비로그인 상태로 요청" })
     async addSign(@Request() req: IRequestWithUser, @UploadedFile() image): Promise<SignAddResponse> {
         const newSign = await this.signsService.addSign({ user: req.user, image });
         return new SignAddResponse({ signId: newSign.id.toString(), signImageUrl: newSign.signImageUrl });
     }
 
     @Get()
-    async getMySigns(@Request() req: IRequestWithUser): Promise<IResponse<Sign[]>> {
+    @ApiCreatedResponse({ description: "서명 가져오기 성공", type: [SignGetResponse] })
+    @ApiUnauthorizedResponse({ description: "비로그인 상태로 요청" })
+    async getMySigns(@Request() req: IRequestWithUser): Promise<SignGetResponse[]> {
         const signs = await this.signsService.getMySigns({ user: req.user });
-        return setSuccessRespFormat(signs);
+
+        return signs.map<SignGetResponse>(sign => {
+            return new SignGetResponse({
+                signId: sign.id.toString(),
+                signImageUrl: sign.signImageUrl,
+                createdAt: sign.createdAt,
+            });
+        });
     }
 
     @Delete("/:signId")
     @UsePipes(new ValidationPipe({ transform: true }))
-    async deleteSign(@Request() req: IRequestWithUser, @Param("signId") signId: string): Promise<IResponse<void>> {
+    @ApiParam({ description: "삭제할 서명의 ID", name: "signId" })
+    @ApiCreatedResponse({ description: "서명 삭제 성공", type: SimpleSuccessResponse })
+    @ApiUnauthorizedResponse({ description: "비로그인 상태로 요청" })
+    @ApiForbiddenResponse({ description: "소유하지 않은 서명 삭제 요청" })
+    @ApiNotFoundResponse({ description: "서명을 찾을 수 없음" })
+    async deleteSign(
+        @Request() req: IRequestWithUser,
+        @Param("signId") signId: string,
+    ): Promise<SimpleSuccessResponse> {
         await this.signsService.deleteSign({ user: req.user, signId });
-        return setSuccessRespFormat();
+        return new SimpleSuccessResponse();
     }
 }
