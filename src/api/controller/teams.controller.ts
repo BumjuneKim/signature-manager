@@ -19,7 +19,9 @@ import { Team } from "../entity/team.entity";
 import { IResponse, setSuccessRespFormat } from "../../common/middleware/userParse";
 import { TeamSignDeleteDto } from "../dto/request/teamsign-delete-dto";
 import { TeamCrewAuthEditDto } from "../dto/request/teamcrew-auth-edit-dto";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags("signature-manager")
 @Controller("/api/teams")
 export class TeamsController {
     constructor(private readonly teamsService: TeamsService) {}

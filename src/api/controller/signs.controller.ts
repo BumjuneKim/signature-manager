@@ -18,12 +18,14 @@ import { SignsService } from "../service/signs.service";
 import { ApiExceptionFilter } from "../../common/exception/ApiExceptionFilter";
 import { Sign } from "../entity/sign.entity";
 import { IResponse, setSuccessRespFormat } from "../../common/middleware/userParse";
-import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiResponse } from "@nestjs/swagger";
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FileUploadDto } from "../dto/request/file-upload-dto";
 import { ApiImplicitFile } from "@nestjs/swagger/dist/decorators/api-implicit-file.decorator";
 import { UserDto } from "../dto/request/user-dto";
 import { SignupResponse } from "../dto/response/signup-response";
+import { SignAddResponse } from "../dto/response/sign-add-response";
 
+@ApiTags("signature-manager")
 @Controller("/api/signs")
 @UseFilters(new ApiExceptionFilter())
 export class SignsController {
@@ -58,11 +60,12 @@ export class SignsController {
     @ApiConsumes("multipart/form-data")
     @ApiBody({ description: "서명 생성 API", type: FileUploadDto })
     @UsePipes(new ValidationPipe({ transform: true }))
-    // @ApiCreatedResponse({ description: "서명 등록 성공", type: Sign })
-    // @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "서명으로 사용할 이미지 없음" })
-    // @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "비로그인 상태로 요청" })
-    async addSign(@Request() req: IRequestWithUser, @UploadedFile() image): Promise<Sign> {
-        return await this.signsService.addSign({ user: req.user, image });
+    @ApiCreatedResponse({ description: "서명 등록 성공", type: SignAddResponse })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "서명으로 사용할 이미지 없음" })
+    @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "비로그인 상태로 요청" })
+    async addSign(@Request() req: IRequestWithUser, @UploadedFile() image): Promise<SignAddResponse> {
+        const newSign = await this.signsService.addSign({ user: req.user, image });
+        return new SignAddResponse({ signId: newSign.id.toString(), signImageUrl: newSign.signImageUrl });
     }
 
     @Get()
